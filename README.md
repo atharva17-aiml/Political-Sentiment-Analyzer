@@ -1,67 +1,124 @@
 # 🗳️ Political Sentiment Analyzer
 
-A Machine Learning + NLP project that analyzes political text and predicts sentiment (Positive, Negative, Neutral) with explanations.
+An AI-powered **Political Sentiment Analysis System** built with Machine Learning and NLP to analyze political statements and classify them as **Positive, Negative, Neutral, or Mixed**.
+
+The system combines a traditional TF-IDF machine learning model, a Transformer-based semantic model, rule-based linguistic analysis, contrast detection, and Retrieval-Augmented Generation (RAG) to produce more explainable sentiment decisions.
 
 ---
 
 ## 🚀 Features
 
-* 🌍 Multilingual Support (English, Hindi, Marathi)
-* 🔄 Automatic Translation
-* 📊 Sentiment Prediction with Confidence Score
-* 🧠 Explainable AI (word-level insights)
-* 📈 Data-driven insights from past records
+### 🧠 Hybrid Sentiment Analysis
+- TF-IDF feature extraction
+- Logistic Regression classification
+- Twitter-RoBERTa Transformer-based semantic analysis
+- Hybrid decision engine combining multiple signals
+- Sentiment confidence scores
+
+### 🔍 Explainable AI
+- Positive evidence detection
+- Negative evidence detection
+- Contrast-aware sentiment analysis
+- Negation and linguistic pattern detection
+- Sarcasm-aware analysis
+- Explanation of the final sentiment decision
+
+### 🎯 Sentiment Categories
+- 🟢 Positive
+- 🔴 Negative
+- 🟣 Mixed
+- ⚪ Neutral
+
+### 🌐 English-Only Analysis
+The current version supports **English political statements only**.
+
+Hindi, Marathi, Hinglish, and other non-English inputs are detected and rejected instead of being automatically translated.
 
 ---
 
-## 🛠️ Tech Stack
+## 📊 CSV Sentiment Analysis
 
-* Python
-* Streamlit
-* Scikit-learn
-* Word2Vec (Gensim)
-* Pandas, NumPy
-* Matplotlib
+Upload a CSV file containing political statements and analyze an entire dataset.
 
----
+Features include:
 
-## ▶️ Run Locally
+- CSV file upload
+- Text-column selection
+- Batch sentiment analysis
+- TF-IDF prediction
+- TF-IDF confidence
+- Transformer prediction
+- Transformer confidence
+- Final sentiment
+- Positive evidence
+- Negative evidence
+- Contrast direction
+- Contrast connector
+- Downloadable CSV results
 
-```bash
-pip install -r requirements.txt
-streamlit run app.py
-```
-
----
-
-## 📸 Demo
-
-(Add screenshots here later)
+The application provides a progress indicator while processing the dataset. :chatgpt-content-reference{index="2"}
 
 ---
 
-## 📂 Project Structure
+## 📜 Prediction History
 
-```
-├── app.py
-├── train.py
-├── rag.py
-├── preprocess.py
-├── requirements.txt
-├── models/
-```
+The application stores analyzed statements in an SQLite database.
 
----
+Prediction History provides:
 
-## 🎯 Future Improvements
+- Previously analyzed political statements
+- TF-IDF predictions
+- Transformer predictions
+- Final sentiment
+- Model confidence scores
+- Decision method
+- Timestamp
+- Sentiment distribution visualization
 
-* Improve model accuracy
-* Add more datasets
-* Deploy on cloud
-* Real-time sentiment tracking
+:chatgpt-content-reference{index="3"}
 
 ---
 
-## 👨‍💻 Author
+## 🧠 Retrieval-Augmented Generation (RAG)
 
-Atharva Unde
+The system retrieves relevant political context from a historical knowledge base.
+
+### RAG Components
+
+- SentenceTransformer
+- FAISS vector similarity search
+- Historical political context
+- Top relevant context retrieval
+
+The application displays **Related Political Context** after sentiment analysis. :chatgpt-content-reference{index="4"}
+
+---
+
+## ⚙️ Sentiment Decision Pipeline
+
+```text
+Political Statement
+        ↓
+English Language Validation
+        ↓
+Text Preprocessing
+        ↓
+TF-IDF Feature Extraction
+        ↓
+Logistic Regression
+        ↓
+Transformer Semantic Analysis
+        ↓
+Positive / Negative Evidence
+        ↓
+Negation & Contrast Analysis
+        ↓
+Sarcasm Detection
+        ↓
+Contrast-Aware Hybrid Decision Engine
+        ↓
+Final Sentiment
+        ↓
+RAG Historical Context
+        ↓
+Explanation & Visualization
