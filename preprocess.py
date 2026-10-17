@@ -1,48 +1,149 @@
 import re
-import nltk
-from nltk.corpus import stopwords
 
-# ---------------- LOAD STOPWORDS SAFELY ----------------
-def load_stopwords():
-    try:
-        return set(stopwords.words("english"))
-    except LookupError:
-        nltk.download("stopwords")
-        return set(stopwords.words("english"))
 
-stop_words = load_stopwords()
-
-# ---------------- CLEAN TEXT FUNCTION ----------------
 def clean_text(text):
     """
-    Cleans input text by:
-    - Lowercasing
-    - Removing URLs
-    - Removing special characters
-    - Removing extra spaces
-    - Removing stopwords
+    Common preprocessing used during both
+    training and prediction.
     """
 
     if not isinstance(text, str):
         return ""
 
-    # Lowercase
     text = text.lower()
 
-    # Remove URLs
-    text = re.sub(r"http\S+|www\S+", "", text)
+    # --------------------------------------------------
+    # IMPORTANT NEGATION PHRASES
+    # --------------------------------------------------
 
-    # Remove mentions & hashtags (NEW 🔥)
-    text = re.sub(r"@\w+|#\w+", "", text)
+    negations = {
+        "not good": "not_good",
+        "not great": "not_great",
+        "not excellent": "not_excellent",
+        "not effective": "not_effective",
+        "not successful": "not_successful",
+        "not working": "not_working",
+        "not acceptable": "not_acceptable",
+        "not satisfied": "not_satisfied",
+        "not happy": "not_happy",
+        "never good": "never_good",
+        "never successful": "never_successful"
+    }
 
-    # Remove non-alphabet characters
-    text = re.sub(r"[^a-zA-Z]", " ", text)
+    for old, new in negations.items():
+        text = text.replace(old, new)
 
-    # Remove extra spaces
-    text = re.sub(r"\s+", " ", text).strip()
+    # --------------------------------------------------
+    # POLITICAL SENTIMENT PHRASES
+    # --------------------------------------------------
 
-    # Tokenize & remove stopwords
-    words = text.split()
-    words = [word for word in words if word not in stop_words]
+    replacements = {
+        "highly appreciated": "highly_appreciated",
+        "great job": "great_job",
+        "doing a great job": "doing_great_job",
+        "doing good work": "doing_good_work",
+        "excellent work": "excellent_work",
+        "excellent job": "excellent_job",
 
-    return " ".join(words)
+        "employment opportunities": "employment_opportunities",
+
+        "jobs are hard to find": "jobs_hard_find",
+        "lack of jobs": "lack_jobs",
+        "lack of employment": "lack_employment",
+
+        "failed to deliver": "failed_deliver",
+        "failed to create jobs": "failed_create_jobs",
+
+        "poor governance": "poor_governance",
+        "strong performance": "strong_performance",
+
+        "rising prices": "rising_prices",
+        "price rise": "price_rise",
+        "price increase": "price_increase",
+
+        "high inflation": "high_inflation",
+
+        "jobless": "unemployed",
+        "unemployment": "unemployment",
+
+        "very disappointed": "very_disappointed",
+        "extremely frustrated": "extremely_frustrated"
+    }
+
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+
+    # --------------------------------------------------
+    # NORMALIZE COMMON WORDS
+    # --------------------------------------------------
+
+    word_replacements = {
+        "inflation": "inflation",
+        "frustrated": "frustrated",
+        "frustration": "frustrated",
+        "disappointed": "disappointed",
+        "disappointment": "disappointed",
+        "corruption": "corruption",
+        "corrupt": "corrupt",
+        "successful": "successful",
+        "success": "success",
+        "effective": "effective",
+        "efficient": "efficient",
+        "improved": "improved",
+        "improvement": "improvement"
+    }
+
+    for old, new in word_replacements.items():
+        text = text.replace(old, new)
+
+    # --------------------------------------------------
+    # REMOVE URLS
+    # --------------------------------------------------
+
+    text = re.sub(
+        r"http\S+|www\S+",
+        "",
+        text
+    )
+
+    # --------------------------------------------------
+    # REMOVE MENTIONS
+    # --------------------------------------------------
+
+    text = re.sub(
+        r"@\w+",
+        "",
+        text
+    )
+
+    # --------------------------------------------------
+    # REMOVE HASHTAGS BUT KEEP WORD
+    # --------------------------------------------------
+
+    text = re.sub(
+        r"#(\w+)",
+        r"\1",
+        text
+    )
+
+    # --------------------------------------------------
+    # KEEP WORDS / UNDERSCORES
+    # --------------------------------------------------
+
+    text = re.sub(
+        r"[^a-zA-Z_\s]",
+        " ",
+        text
+    )
+
+    # --------------------------------------------------
+    # REMOVE EXTRA SPACES
+    # --------------------------------------------------
+
+    text = re.sub(
+        r"\s+",
+        " ",
+        text
+    ).strip()
+
+    return text

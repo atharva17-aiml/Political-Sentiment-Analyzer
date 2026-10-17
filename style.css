@@ -1,0 +1,1493 @@
+/* ============================================================
+   POLITICAL SENTIMENT ANALYZER
+   MODERN WHITE + SOFT PURPLE DASHBOARD UI
+   Academic & Production Standard Theme
+   ============================================================ */
+
+@import url(
+    'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap'
+);
+
+/* ============================================================
+   ROOT VARIABLES
+   ============================================================ */
+
+:root {
+    --purple: #6a5acd;
+    --purple-dark: #5a3fc0;
+    --purple-light: #806bd1;
+    --purple-soft: #f3f0ff;
+    --purple-soft-2: #f8f6ff;
+    --purple-border: #e5def8;
+
+    --page-bg: #f7f6fa;
+    --white: #ffffff;
+
+    --text-dark: #24202f;
+    --text: #403b4d;
+    --text-muted: #777184;
+    --text-light: #9b96a5;
+
+    --border: #e8e5ed;
+    --border-light: #eeeaf3;
+
+    --green: #1f9d68;
+    --green-bg: #edf9f3;
+    --green-border: #bfe9d4;
+
+    --red: #d9534f;
+    --red-bg: #fff1f0;
+    --red-border: #f1c5c2;
+
+    --orange: #d88921;
+    --orange-bg: #fff7e8;
+    --orange-border: #f0d39d;
+
+    --shadow-sm: 0 4px 14px rgba(48, 37, 85, 0.06);
+    --shadow: 0 10px 30px rgba(48, 37, 85, 0.09);
+    --shadow-lg: 0 18px 45px rgba(48, 37, 85, 0.12);
+
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-lg: 16px;
+}
+
+
+/* ============================================================
+   GLOBAL RESET
+   ============================================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+[class*="css"] {
+    font-family: "Montserrat", sans-serif;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--page-bg);
+}
+
+body {
+    color: var(--text);
+}
+
+.stApp {
+    background:
+        linear-gradient(
+            180deg,
+            #faf9fc 0%,
+            #f7f6fa 45%,
+            #f8f7fb 100%
+        );
+}
+
+
+/* ============================================================
+   REMOVE STREAMLIT DEFAULT SPACE
+   ============================================================ */
+
+.block-container {
+    max-width: 1380px !important;
+    padding-top: 1.5rem !important;
+    padding-bottom: 2rem !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+}
+
+.main .block-container {
+    padding-top: 1.5rem !important;
+}
+
+header[data-testid="stHeader"] {
+    background: transparent !important;
+    height: 0 !important;
+}
+
+[data-testid="stDecoration"] {
+    display: none !important;
+}
+
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f4f2f8;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c8c1dd;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a99fc9;
+}
+
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+
+section[data-testid="stSidebar"] {
+    background:
+        linear-gradient(
+            180deg,
+            #7662ca 0%,
+            #6b55bf 48%,
+            #6049b0 100%
+        ) !important;
+
+    border-right: none !important;
+}
+
+section[data-testid="stSidebar"] > div {
+    background: transparent !important;
+}
+
+section[data-testid="stSidebar"] * {
+    font-family: "Montserrat", sans-serif !important;
+}
+
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] div {
+    color: #ffffff !important;
+}
+
+/* ============================================================
+   PERMANENTLY PIN SIDEBAR & REMOVE ARROW TEXT
+   ============================================================ */
+
+/* 1. Hide collapse/expand buttons, header container, and raw arrow ligatures */
+button[data-testid="stSidebarCollapseButton"],
+[data-testid="collapsedControl"],
+[data-testid="stSidebarHeader"] button,
+[data-testid="stSidebarHeader"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    font-size: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    padding: 0 !important;
+}
+
+/* 2. Lock the sidebar into a fixed, stationary panel */
+section[data-testid="stSidebar"] {
+    display: block !important;
+    position: relative !important;
+    transform: none !important;
+    transition: none !important;
+    margin-left: 0 !important;
+    width: 21rem !important;
+    min-width: 21rem !important;
+    max-width: 21rem !important;
+}
+
+/* ============================================================
+   SIDEBAR BRAND (PERFECT VERTICAL ALIGNMENT WITH MAIN HEADER)
+   ============================================================ */
+
+section[data-testid="stSidebar"] > div:first-child {
+    padding-top: 1.5rem !important;
+    padding-left: 1.2rem !important;
+    padding-right: 1.2rem !important;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 0 16px 0 !important;
+    margin: 0 0 10px 0 !important;
+    width: 100%;
+}
+
+.brand-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(255, 255, 255, 0.16) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+
+    border-radius: 13px;
+
+    color: #ffffff !important;
+    font-size: 22px;
+
+    box-shadow: 0 8px 20px rgba(31, 20, 74, 0.16);
+}
+
+.brand-copy {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-title {
+    color: #ffffff !important;
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.2px;
+}
+
+.brand-subtitle {
+    margin-top: 4px;
+
+    color: rgba(255, 255, 255, 0.82) !important;
+    font-size: 12px;
+    font-weight: 500;
+
+    letter-spacing: 0.2px;
+}
+
+/* ============================================================
+   SIDEBAR SECTION
+   ============================================================ */
+
+.sidebar-section-title {
+    margin: 20px 4px 10px 4px;
+
+    color: rgba(255, 255, 255, 0.78) !important;
+
+    font-size: 11px !important;
+    font-weight: 700 !important;
+
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+
+/* ============================================================
+   SIDEBAR SYSTEM CARD
+   ============================================================ */
+
+.sidebar-system-card {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 12px;
+
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 12px;
+
+    box-shadow: 0 8px 20px rgba(37, 25, 91, 0.08);
+}
+
+.system-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    width: 100%;
+
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.system-chip:hover {
+    background: rgba(255, 255, 255, 0.13);
+}
+
+.system-chip-tag {
+    font-size: 9.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.system-chip-val {
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+/* ============================================================
+   SIDEBAR RADIO ACTIVE INDICATORS
+   ============================================================ */
+
+section[data-testid="stSidebar"] [role="radiogroup"] {
+    gap: 6px;
+}
+
+section[data-testid="stSidebar"] [role="radiogroup"] label {
+    padding: 9px 12px !important;
+    border-radius: 9px !important;
+    transition: all 0.2s ease !important;
+}
+
+section[data-testid="stSidebar"] [role="radiogroup"] label p {
+    font-size: 14px !important;
+}
+
+section[data-testid="stSidebar"] [role="radiogroup"] label:hover {
+    background: rgba(255, 255, 255, 0.14) !important;
+}
+
+section[data-testid="stSidebar"] [role="radiogroup"] label[data-checked="true"],
+section[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) {
+    background: rgba(255, 255, 255, 0.22) !important;
+    border-left: 3.5px solid #ffffff !important;
+    font-weight: 700 !important;
+}
+
+/* ============================================================
+   MAIN DASHBOARD HEADER (CENTERED)
+   ============================================================ */
+
+.dashboard-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 28px;
+}
+
+.dashboard-header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+}
+
+.page-title {
+    margin: 0 auto;
+    color: var(--text-dark);
+    font-size: 30px;
+    line-height: 1.25;
+    font-weight: 800;
+    letter-spacing: -0.7px;
+    text-align: center;
+}
+
+.dashboard-subtitle {
+    margin: 10px auto 0 auto;
+    color: var(--text-muted);
+    font-size: 13.5px;
+    line-height: 1.6;
+    font-weight: 500;
+    text-align: center;
+    max-width: 680px;
+}
+
+
+/* ============================================================
+   SECTION HEADINGS
+   ============================================================ */
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin-bottom: 14px;
+
+    color: var(--text-dark);
+
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.section-heading-spaced {
+    margin-top: 26px;
+}
+
+.section-icon {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background: var(--purple-soft);
+
+    color: var(--purple);
+
+    font-size: 15px;
+}
+
+.section-title {
+    color: var(--text-dark);
+    font-size: 16.5px;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.section-description {
+    color: var(--text-muted);
+    font-size: 12.5px;
+    font-weight: 500;
+    margin-top: 3px;
+    line-height: 1.5;
+}
+
+
+/* ============================================================
+   DASHBOARD STATS
+   ============================================================ */
+
+.dashboard-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 14px;
+
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+
+    min-height: 88px;
+
+    padding: 16px 18px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--border);
+
+    border-radius: 13px;
+
+    box-shadow: var(--shadow-sm);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.stat-icon {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-right: 14px;
+
+    background: var(--purple-soft);
+
+    border-radius: 11px;
+
+    color: var(--purple);
+
+    font-size: 18px;
+}
+
+.sentiment-stat-positive .stat-icon {
+    background: var(--green-bg);
+    color: var(--green);
+}
+
+.sentiment-stat-negative .stat-icon {
+    background: var(--red-bg);
+    color: var(--red);
+}
+
+.sentiment-stat-mixed .stat-icon {
+    background: var(--purple-soft) !important;
+    color: var(--purple) !important;
+}
+
+.stat-content {
+    min-width: 0;
+}
+
+.stat-label {
+    margin-bottom: 3px;
+
+    color: var(--text-muted);
+
+    font-size: 11.5px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value,
+.stat-content strong {
+    color: var(--text-dark);
+
+    font-size: 24px;
+    font-weight: 800;
+}
+
+
+/* ============================================================
+   GLASS / WHITE CARDS
+   ============================================================ */
+
+.glass-card,
+.page-section {
+    display: block;
+    width: 100%;
+    padding: 22px 24px;
+
+    margin-bottom: 20px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius-lg);
+
+    box-shadow: var(--shadow-sm);
+}
+
+
+/* ============================================================
+   RESULT CARD
+   ============================================================ */
+
+.result-card {
+    margin-top: 20px;
+
+    padding: 24px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--border);
+
+    border-radius: 15px;
+
+    box-shadow: var(--shadow);
+}
+
+.result-topline {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.sentiment-result {
+    display: flex;
+    align-items: center;
+
+    gap: 16px;
+
+    padding: 18px 22px;
+    border-radius: 12px;
+
+    margin-bottom: 16px;
+}
+
+.sentiment-result-icon {
+    width: 48px;
+    height: 48px;
+
+    flex: 0 0 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.sentiment-result-content {
+    min-width: 0;
+}
+
+.sentiment-label {
+    margin-bottom: 4px;
+
+    font-size: 20px;
+    font-weight: 800;
+
+    letter-spacing: 0.2px;
+}
+
+.sentiment-message {
+    font-size: 13.5px;
+    font-weight: 500;
+    opacity: 0.95;
+}
+
+
+/* ============================================================
+   SENTIMENT COLORS (HIGH CONTRAST FOR PRESENTATIONS)
+   ============================================================ */
+
+.sentiment-positive {
+    color: #126e47 !important;
+    background: #edf9f3 !important;
+    border: 1px solid #a3e4c4 !important;
+    border-left: 6px solid var(--green) !important;
+}
+
+.sentiment-positive .sentiment-result-icon {
+    background: #daf3e5;
+    color: var(--green);
+}
+
+.sentiment-negative {
+    color: #b32622 !important;
+    background: #fff1f0 !important;
+    border: 1px solid #f6b5b2 !important;
+    border-left: 6px solid var(--red) !important;
+}
+
+.sentiment-negative .sentiment-result-icon {
+    background: #fde5e3;
+    color: var(--red);
+}
+
+.sentiment-mixed {
+    color: #5a3fc0 !important;
+    background: #f5f2ff !important;
+    border: 1px solid #dcd3f8 !important;
+    border-left: 6px solid #6a5acd !important;
+}
+
+.sentiment-mixed .sentiment-result-icon {
+    background: #e8e2fa !important;
+    color: #6a5acd !important;
+}
+
+.sentiment-neutral {
+    color: #334155 !important;
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-left: 6px solid #64748b !important;
+}
+
+.sentiment-neutral .sentiment-result-icon {
+    background: #e2e8f0 !important;
+    color: #475569 !important;
+}
+
+
+/* ============================================================
+   RESULT METRICS
+   ============================================================ */
+
+.result-metrics {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-top: 14px;
+}
+
+.result-metric {
+    padding: 14px 16px;
+
+    background: #faf9fc;
+
+    border: 1px solid var(--border-light);
+
+    border-radius: 10px;
+}
+
+.result-metric-label {
+    color: var(--text-muted);
+
+    font-size: 11px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.result-metric-value {
+    margin-top: 6px;
+
+    color: var(--text-dark);
+
+    font-size: 15px;
+    font-weight: 800;
+}
+
+
+/* ============================================================
+   TEXTAREA (ELEVATED & WITH EXTENSION PADDING)
+   ============================================================ */
+
+textarea {
+    font-family: "Montserrat", sans-serif !important;
+}
+
+.stTextArea textarea {
+    min-height: 135px !important;
+
+    padding: 16px 18px 30px 18px !important;
+
+    background: #ffffff !important;
+
+    color: var(--text-dark) !important;
+
+    border: 1.5px solid #d4cde3 !important;
+
+    border-radius: 12px !important;
+
+    font-size: 14.5px !important;
+    line-height: 1.65 !important;
+
+    resize: vertical !important;
+
+    box-shadow: 0 2px 6px rgba(48, 37, 85, 0.03) !important;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.stTextArea textarea:focus {
+    border-color: var(--purple) !important;
+
+    box-shadow:
+        0 0 0 4px rgba(106, 90, 205, 0.12) !important;
+}
+
+.stTextArea textarea::placeholder {
+    color: #9d98a6 !important;
+}
+
+.stTextArea label,
+.stSelectbox label,
+.stFileUploader label,
+.stRadio label,
+.stCheckbox label {
+    color: var(--text-dark) !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+}
+
+
+/* ============================================================
+   FIX: UN-TRUNCATED PRIMARY BUTTON
+   ============================================================ */
+
+div[data-testid="column"] .stButton {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.stButton > button {
+    width: auto !important;
+    min-width: 220px !important;
+    max-width: none !important;
+
+    min-height: 46px;
+
+    padding: 10px 32px !important;
+
+    white-space: nowrap !important;
+
+    border: none !important;
+    border-radius: 11px !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            var(--purple-dark)
+        ) !important;
+
+    color: #ffffff !important;
+
+    font-family: "Montserrat", sans-serif !important;
+
+    font-size: 13px !important;
+    font-weight: 800 !important;
+
+    letter-spacing: 0.2px;
+
+    box-shadow:
+        0 8px 18px rgba(90, 63, 192, 0.25) !important;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.stButton > button:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 12px 24px rgba(90, 63, 192, 0.30) !important;
+
+    opacity: 0.97;
+}
+
+.stButton > button:active {
+    transform: translateY(0);
+}
+
+
+/* ============================================================
+   INSIGHT BOX
+   ============================================================ */
+
+.insight-box {
+    padding: 20px 22px;
+
+    margin: 16px 0;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f7f4ff,
+            #fbfaff
+        );
+
+    border: 1px solid var(--purple-border);
+
+    border-left: 5px solid var(--purple);
+
+    border-radius: 11px;
+
+    color: var(--text);
+
+    font-size: 13.5px;
+
+    line-height: 1.7;
+
+    box-shadow: 0 5px 15px rgba(82, 62, 143, 0.05);
+}
+
+.insight-label {
+    margin-bottom: 8px;
+
+    color: var(--purple-dark);
+
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.insight-text {
+    color: var(--text);
+    font-size: 13.5px;
+    line-height: 1.7;
+}
+
+
+/* ============================================================
+   EVIDENCE CARDS
+   ============================================================ */
+
+.evidence-card {
+    min-height: 100px;
+
+    padding: 18px 20px;
+
+    background: #ffffff;
+
+    border-radius: 12px;
+
+    border: 1px solid var(--border);
+
+    box-shadow: var(--shadow-sm);
+}
+
+.evidence-title {
+    margin-bottom: 12px;
+
+    color: var(--text-dark);
+
+    font-size: 13.5px;
+    font-weight: 800;
+}
+
+.evidence-positive {
+    border-left: 5px solid var(--green);
+
+    background:
+        linear-gradient(
+            90deg,
+            #f5fcf8,
+            #ffffff
+        );
+}
+
+.evidence-negative {
+    border-left: 5px solid var(--red);
+
+    background:
+        linear-gradient(
+            90deg,
+            #fff7f6,
+            #ffffff
+        );
+}
+
+.evidence-line {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.evidence-bullet {
+    font-weight: 800;
+}
+
+.evidence-empty {
+    font-size: 12.5px;
+    color: var(--text-muted);
+}
+
+
+/* ============================================================
+   DECISION BOX (CENTERED & PROMINENT FINAL DECISION)
+   ============================================================ */
+
+.decision-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    padding: 22px 28px;
+    margin-top: 16px;
+
+    border-radius: 13px;
+
+    font-size: 15px;
+    line-height: 1.7;
+    font-weight: 500;
+}
+
+.decision-label {
+    display: inline-block;
+    margin-bottom: 10px;
+
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.decision-text {
+    font-size: 15px;
+    line-height: 1.7;
+    text-align: center;
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+.decision-positive {
+    background: var(--green-bg);
+    border: 1.5px solid var(--green-border);
+    border-top: 4px solid var(--green);
+    color: #145a32;
+}
+
+.decision-negative {
+    background: var(--red-bg);
+    border: 1.5px solid var(--red-border);
+    border-top: 4px solid var(--red);
+    color: #900c3f;
+}
+
+.decision-mixed {
+    background: #f5f2ff;
+    border: 1.5px solid #dcd3f8;
+    border-top: 4px solid var(--purple);
+    color: var(--purple-dark);
+}
+
+.decision-neutral {
+    background: #f1f5f9;
+    border: 1.5px solid #cbd5e1;
+    border-top: 4px solid #64748b;
+    color: #334155;
+}
+
+
+/* ============================================================
+   RELATED POLITICAL CONTEXT
+   ============================================================ */
+
+.context-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+.context-card {
+    position: relative;
+
+    min-height: 145px;
+
+    padding: 18px 20px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--purple-border);
+
+    border-radius: 13px;
+
+    box-shadow:
+        0 7px 20px rgba(88, 63, 160, 0.08);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.context-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 14px 30px rgba(88, 63, 160, 0.13);
+}
+
+.context-number {
+    width: 30px;
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 10px;
+
+    background: var(--purple-soft);
+
+    color: var(--purple);
+
+    border-radius: 8px;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.context-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.context-text {
+    color: var(--text);
+
+    font-size: 13px;
+
+    line-height: 1.65;
+}
+
+
+/* ============================================================
+   CUSTOM HTML TABLES (HISTORY & OVERVIEW) - FIXED LAYOUT
+   ============================================================ */
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 14px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+}
+
+.custom-table {
+    width: 100%;
+    min-width: 980px; /* Prevents cramped columns on smaller screens */
+    border-collapse: collapse;
+    font-family: "Montserrat", sans-serif;
+    background: #ffffff;
+}
+
+.custom-table thead th {
+    padding: 14px 14px;
+    background: var(--purple-soft);
+    border-bottom: 1.5px solid var(--purple-border);
+    color: var(--purple-dark);
+    font-size: 11.5px;
+    font-weight: 800;
+    text-align: left;
+    white-space: nowrap; /* Keeps all headers on a single line */
+}
+
+.custom-table tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #f0edf4;
+    color: var(--text);
+    font-size: 12px;
+    line-height: 1.5;
+    vertical-align: middle;
+}
+
+.custom-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.custom-table tbody tr:hover {
+    background: #faf9fd;
+}
+
+/* ============================================================
+   PREDICTION HISTORY COLUMN TUNING
+   ============================================================ */
+
+/* 1. ID Column: fixed width, no digit stacking */
+.history-table th:nth-child(1),
+.history-table td:nth-child(1) {
+    min-width: 48px;
+    width: 50px;
+    text-align: center !important;
+    white-space: nowrap !important;
+    font-weight: 700;
+}
+
+/* 2. Political Statement Column: wraps cleanly without breaking words */
+.history-table th:nth-child(2),
+.history-table td:nth-child(2) {
+    min-width: 260px;
+    max-width: 380px;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+    line-height: 1.55;
+}
+
+/* 3. Language Code Column */
+.history-table th:nth-child(3),
+.history-table td:nth-child(3) {
+    min-width: 50px;
+    text-align: center !important;
+    white-space: nowrap !important;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* 4. Model Predictions & Confidence Scores: never wrap or split letters */
+.history-table th:nth-child(4),
+.history-table td:nth-child(4),
+.history-table th:nth-child(5),
+.history-table td:nth-child(5),
+.history-table th:nth-child(6),
+.history-table td:nth-child(6),
+.history-table th:nth-child(7),
+.history-table td:nth-child(7),
+.history-table th:nth-child(8),
+.history-table td:nth-child(8) {
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
+/* 5. Decision Method Column */
+.history-table th:nth-child(9),
+.history-table td:nth-child(9) {
+    min-width: 170px;
+    white-space: nowrap !important;
+}
+
+/* 6. Timestamp Column: keeps date and time together */
+.history-table th:nth-child(10),
+.history-table td:nth-child(10) {
+    min-width: 140px;
+    white-space: nowrap !important;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+/* 7. Pill Badge Sizing */
+.table-badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.4px;
+    text-align: center;
+    white-space: nowrap !important;
+}
+
+
+/* ============================================================
+   FIX: FILE UPLOADER THEME CONSISTENCY
+   ============================================================ */
+
+[data-testid="stFileUploader"] {
+    padding: 4px;
+}
+
+[data-testid="stFileUploaderDropzone"] {
+    background: #ffffff !important;
+
+    border: 1.5px dashed #cfc8dd !important;
+
+    border-radius: 13px !important;
+
+    padding: 24px !important;
+}
+
+[data-testid="stFileUploaderDropzone"] * {
+    color: var(--text-dark) !important;
+}
+
+[data-testid="stFileUploaderDropzone"]:hover {
+    border-color: var(--purple) !important;
+
+    background: #fbfaff !important;
+}
+
+
+/* ============================================================
+   PREVENT MARKDOWN WRAPPING OF CUSTOM HTML
+   ============================================================ */
+
+.stMarkdown pre:has(div.page-section),
+.stMarkdown pre:has(div.dashboard-header),
+.stMarkdown pre:has(div.result-card),
+.stMarkdown pre:has(div.insight-box),
+.stMarkdown pre:has(div.sidebar-brand),
+.stMarkdown pre:has(div.sidebar-system-card) {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+
+.stMarkdown pre code:has(div) {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    font-family: "Montserrat", sans-serif !important;
+}
+
+.stMarkdown p {
+    font-size: 14px !important;
+    line-height: 1.65;
+}
+
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.footer {
+    margin-top: 28px;
+    padding: 18px 10px 8px 10px;
+
+    border-top: 1px solid var(--border);
+
+    color: #777184;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    text-align: center;
+
+    line-height: 1.6;
+
+    letter-spacing: 0.15px;
+}
+
+.footer-separator {
+    margin: 0 6px;
+}
+
+
+/* ============================================================
+   HIDE STREAMLIT BRANDING
+   ============================================================ */
+
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+[data-testid="stToolbar"] {
+    visibility: hidden;
+}
+
+
+/* ============================================================
+   RESPONSIVE DESIGN
+   ============================================================ */
+
+@media (max-width: 1100px) {
+    .dashboard-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .context-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .result-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .block-container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-top: 1rem !important;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .page-title {
+        font-size: 24px;
+    }
+
+    .dashboard-subtitle {
+        font-size: 12px;
+    }
+
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .context-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .result-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .glass-card,
+    .page-section,
+    .result-card {
+        padding: 15px;
+    }
+
+    .sentiment-result {
+        align-items: flex-start;
+    }
+
+    .custom-table {
+        min-width: 700px;
+    }
+
+    .stButton > button {
+        width: 100% !important;
+    }
+}
+
+/* ============================================================
+   FINAL POLISH
+   ============================================================ */
+
+.element-container {
+    margin-bottom: 0 !important;
+}
+
+.stMarkdown {
+    margin-bottom: 0 !important;
+}
+
+[data-testid="stVerticalBlock"] {
+    gap: 0.45rem;
+}
+
+/* ============================================================
+   TOPIC / ASPECT BADGE (IN RESULT CARD)
+   ============================================================ */
+
+.topic-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    background: var(--purple-soft);
+    border: 1px solid var(--purple-border);
+    border-radius: 6px;
+    font-size: 10.5px !important;
+    font-weight: 800 !important;
+    color: var(--purple-dark) !important;
+    letter-spacing: 0.6px;
+}
+
+/* ============================================================
+   STREAMLIT SEGMENTED CONTROL / FILTER BAR
+   ============================================================ */
+
+div[data-testid="stSegmentedControl"] {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 3px;
+    width: fit-content;
+}
+
+div[data-testid="stSegmentedControl"] button {
+    border-radius: 7px !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+}
+
+div[data-testid="stSegmentedControl"] button[aria-checked="true"] {
+    background: var(--purple) !important;
+    color: #ffffff !important;
+}

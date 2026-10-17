@@ -2,217 +2,585 @@ import pandas as pd
 import numpy as np
 import os
 import pickle
-import re
 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
-from sklearn.utils import resample
-from sklearn.ensemble import RandomForestClassifier
-
-from gensim.models import Word2Vec
-
-
-# ---------------- CLEAN TEXT ----------------
-def clean_text(text):
-    text = str(text).lower()
-
-    # 🔥 handle negations
-    text = text.replace("not good", "bad")
-    text = text.replace("not great", "bad")
-    text = text.replace("not effective", "ineffective")
-    text = text.replace("not working", "failed")
-
-    # 🔥 real-world replacements
-    replacements = {
-        "inflation": "price_increase",
-        "unemployment": "job_loss",
-        "jobless": "job_loss",
-        "jobs are hard to find": "job_loss",
-        "expensive": "high_cost",
-        "price rise": "price_increase",
-        "petrol price": "high_cost",
-        "frustrated": "negative_feeling",
-        "struggling": "negative_feeling"
-    }
-
-    for k, v in replacements.items():
-        text = text.replace(k, v)
-
-    # remove special chars
-    text = re.sub(r"[^a-z\s]", "", text)
-
-    return text.strip()
-
-
-# ---------------- LOAD DATA ----------------
-df = pd.read_csv("data/dataset.csv")
-df.columns = df.columns.str.strip()
-
-print("📊 Dataset Preview:")
-print(df.head())
-
-
-# ---------------- CLEAN DATA ----------------
-df["text"] = df["text"].astype(str).apply(clean_text)
-
-df = df[df["text"].str.strip() != ""]
-df = df.drop_duplicates(subset="text")
-
-print("\n📊 Dataset size after cleaning:", len(df))
-
-
-# ---------------- BALANCE DATA ----------------
-df_pos = df[df.label == "positive"]
-df_neg = df[df.label == "negative"]
-df_neu = df[df.label == "neutral"]
-
-min_size = min(len(df_pos), len(df_neg), len(df_neu))
-
-df_pos = resample(df_pos, n_samples=min_size, random_state=42)
-df_neg = resample(df_neg, n_samples=min_size, random_state=42)
-df_neu = resample(df_neu, n_samples=min_size, random_state=42)
-
-df = pd.concat([df_pos, df_neg, df_neu])
-
-print("\n📊 After Balancing:")
-print(df["label"].value_counts())
-
-
-# ---------------- WORD2VEC ----------------
-print("\n🧠 Training Word2Vec...")
-
-sentences = [text.split() for text in df["text"]]
-
-w2v_model = Word2Vec(
-    sentences,
-    vector_size=200,   # 🔥 improved
-    window=7,
-    min_count=2,
-    workers=4,
-    sg=1               # skip-gram
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix
 )
 
-print("✅ Word2Vec training completed")
+from preprocess import clean_text
 
 
-# ---------------- TEXT → VECTOR ----------------
-def get_vector(text):
-    words = text.split()
-    vectors = [w2v_model.wv[w] for w in words if w in w2v_model.wv]
+# ============================================================
+# CONFIG
+# ============================================================
 
-    if len(vectors) == 0:
-        return np.zeros(200)
-
-    return np.mean(vectors, axis=0) * (1 + len(vectors)/10)
+RANDOM_STATE = 42
 
 
-# ---------------- FEATURES ----------------
-X = np.array([get_vector(text) for text in df["text"]])
+# ============================================================
+# HEADER
+# ============================================================
+
+print("\n" + "=" * 65)
+print("🗳️ POLITICAL SENTIMENT ANALYSIS - TF-IDF MODEL TRAINING")
+print("=" * 65)
+
+
+# ============================================================
+# LOAD DATA
+# ============================================================
+
+df = pd.read_csv(
+    "data/dataset.csv"
+)
+
+df.columns = df.columns.str.strip()
+
+
+print("\n📊 Dataset Preview:")
+print(
+    df.head()
+)
+
+
+print("\n📊 Dataset Columns:")
+print(
+    df.columns.tolist()
+)
+
+
+# ============================================================
+# VALIDATE DATA
+# ============================================================
+
+required_columns = [
+    "text",
+    "label"
+]
+
+
+for column in required_columns:
+
+    if column not in df.columns:
+
+        raise ValueError(
+            f"❌ Missing required column: {column}"
+        )
+
+
+# ============================================================
+# CLEAN TEXT
+# ============================================================
+
+print("\n🧹 Cleaning dataset...")
+
+
+df["text"] = (
+    df["text"]
+    .astype(str)
+    .apply(clean_text)
+)
+
+
+# Remove empty text
+df = df[
+    df["text"].str.strip() != ""
+]
+
+
+# Remove duplicates
+df = df.drop_duplicates(
+    subset="text"
+)
+
+
+# Normalize labels
+df["label"] = (
+    df["label"]
+    .astype(str)
+    .str.lower()
+    .str.strip()
+)
+
+
+# Keep valid labels
+valid_labels = [
+    "positive",
+    "negative",
+    "neutral"
+]
+
+
+df = df[
+    df["label"].isin(
+        valid_labels
+    )
+]
+
+
+df = df.reset_index(
+    drop=True
+)
+
+
+print(
+    "\n📊 Dataset size:",
+    len(df)
+)
+
+
+# ============================================================
+# CLASS DISTRIBUTION
+# ============================================================
+
+print(
+    "\n📊 Class Distribution:"
+)
+
+print(
+    df["label"].value_counts()
+)
+
+
+# ============================================================
+# FEATURES
+# ============================================================
+
+X_text = df["text"]
+
 y = df["label"]
 
 
-# ---------------- SPLIT ----------------
+# ============================================================
+# TRAIN TEST SPLIT
+# ============================================================
+
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y,
-    test_size=0.3,
-    random_state=42,
+
+    X_text,
+    y,
+
+    test_size=0.25,
+
+    random_state=RANDOM_STATE,
+
     stratify=y
 )
 
 
-# ---------------- MODEL ----------------
-print("\n🤖 Training Model...")
-
-model = RandomForestClassifier(
-    n_estimators=300,
-    random_state=42
+print(
+    "\n📚 Training samples:",
+    len(X_train)
 )
 
-model.fit(X_train, y_train)
-
-print("✅ Model trained successfully")
-
-
-# ---------------- EVALUATION ----------------
-y_pred = model.predict(X_test)
-
-accuracy = accuracy_score(y_test, y_pred)
-
-print(f"\n✅ Accuracy: {accuracy:.2f}\n")
-print("📊 Classification Report:")
-print(classification_report(y_test, y_pred))
+print(
+    "🧪 Testing samples:",
+    len(X_test)
+)
 
 
-# ---------------- RULE BOOST ----------------
+# ============================================================
+# TF-IDF
+# ============================================================
+
+print(
+    "\n🔢 Training TF-IDF vectorizer..."
+)
+
+
+vectorizer = TfidfVectorizer(
+
+    lowercase=True,
+
+    ngram_range=(1, 2),
+
+    min_df=1,
+
+    max_df=0.95,
+
+    sublinear_tf=True,
+
+    max_features=5000,
+
+    strip_accents="unicode"
+)
+
+
+X_train_tfidf = vectorizer.fit_transform(
+    X_train
+)
+
+
+X_test_tfidf = vectorizer.transform(
+    X_test
+)
+
+
+print(
+    "✅ TF-IDF completed"
+)
+
+
+print(
+    "Feature matrix:",
+    X_train_tfidf.shape
+)
+
+
+# ============================================================
+# LOGISTIC REGRESSION
+# ============================================================
+
+print(
+    "\n🤖 Training Logistic Regression..."
+)
+
+
+model = LogisticRegression(
+
+    max_iter=3000,
+
+    C=2.0,
+
+    class_weight="balanced",
+
+    random_state=RANDOM_STATE
+)
+
+
+model.fit(
+    X_train_tfidf,
+    y_train
+)
+
+
+print(
+    "✅ Model trained successfully"
+)
+
+
+# ============================================================
+# EVALUATION
+# ============================================================
+
+print("\n" + "=" * 65)
+print("📊 MODEL EVALUATION")
+print("=" * 65)
+
+
+y_pred = model.predict(
+    X_test_tfidf
+)
+
+
+accuracy = accuracy_score(
+    y_test,
+    y_pred
+)
+
+
+print(
+    f"\n🎯 Accuracy: {accuracy * 100:.2f}%"
+)
+
+
+print(
+    "\n📋 Classification Report:"
+)
+
+
+print(
+    classification_report(
+        y_test,
+        y_pred,
+        zero_division=0
+    )
+)
+
+
+print(
+    "\n🔲 Confusion Matrix:"
+)
+
+
+print(
+    confusion_matrix(
+        y_test,
+        y_pred
+    )
+)
+
+
+# ============================================================
+# RULE DETECTION
+# ============================================================
+
 def rule_boost(text):
-    # 🔥 direct phrase detection (VERY IMPORTANT)
-    if "jobs are hard to find" in text:
-        return "negative"
-    if "unemployment" in text:
-        return "negative"
 
-    negative_words = [
-        "price_increase", "job_loss",
-        "negative_feeling", "failed", "bad", "high_cost"
+    text = text.lower()
+
+
+    # Strong negative phrases
+
+    negative_phrases = [
+
+        "jobs are hard to find",
+
+        "lack of jobs",
+
+        "lack of employment",
+
+        "unemployment",
+
+        "rising prices",
+
+        "high inflation",
+
+        "price increase",
+
+        "price rise",
+
+        "poor governance",
+
+        "failed to deliver",
+
+        "failed to create jobs",
+
+        "corruption",
+
+        "corrupt government",
+
+        "very disappointed",
+
+        "extremely frustrated",
+
+        "people are struggling",
+
+        "not good",
+
+        "not effective",
+
+        "not successful"
     ]
 
-    for word in negative_words:
-        if word in text:
+
+    # Strong positive phrases
+
+    positive_phrases = [
+
+        "highly appreciated",
+
+        "well appreciated",
+
+        "great job",
+
+        "doing a great job",
+
+        "doing good work",
+
+        "excellent work",
+
+        "excellent job",
+
+        "strong performance",
+
+        "successful policy",
+
+        "excellent policy",
+
+        "significant improvement",
+
+        "great progress",
+
+        "very effective",
+
+        "highly effective"
+    ]
+
+
+    for phrase in negative_phrases:
+
+        if phrase in text:
+
             return "negative"
+
+
+    for phrase in positive_phrases:
+
+        if phrase in text:
+
+            return "positive"
+
 
     return None
 
 
-# ---------------- REAL TEST ----------------
-print("\n🔍 Real-world Testing:")
+# ============================================================
+# REAL WORLD TESTING
+# ============================================================
+
+print("\n" + "=" * 65)
+print("🔍 REAL-WORLD TESTING")
+print("=" * 65)
+
 
 test_sentences = [
+
     "People are frustrated with inflation",
+
     "Government is doing a great job",
+
     "The policy was announced yesterday",
+
     "Jobs are hard to find",
-    "This decision is not good"
+
+    "This decision is not good",
+
+    "The government's efforts to create more employment opportunities are highly appreciated.",
+
+    "The government has failed to control inflation.",
+
+    "The parliament discussed the new policy.",
+
+    "The administration is successful",
+
+    "The government is doing good work"
 ]
+
 
 for text in test_sentences:
 
-    # 🔥 FIRST apply rule on ORIGINAL text
-    rule = rule_boost(text.lower())
+    cleaned = clean_text(
+        text
+    )
 
-    cleaned = clean_text(text)
-    vec = get_vector(cleaned)
+
+    vector = vectorizer.transform(
+        [cleaned]
+    )
+
+
+    model_prediction = model.predict(
+        vector
+    )[0]
+
+
+    probabilities = model.predict_proba(
+        vector
+    )[0]
+
+
+    classes = model.classes_
+
+
+    model_confidence = (
+        max(probabilities) * 100
+    )
+
+
+    rule = rule_boost(
+        text
+    )
+
 
     if rule:
-        pred = rule
 
-        # -------- CONFIDENCE --------
-        proba = [0.0, 0.0, 0.0]
-        labels = ["negative", "neutral", "positive"]
-        confidence = 100.0   # rule-based strong
+        final_prediction = rule
+
+        method = "Rule + ML"
 
     else:
-        pred = model.predict([vec])[0]
 
-        # -------- CONFIDENCE --------
-        try:
-            proba = model.predict_proba([vec])[0]
-            confidence = round(max(proba) * 100, 2)
-            labels = model.classes_
-        except:
-            proba = [0.33, 0.33, 0.34]
-            labels = ["negative", "neutral", "positive"]
-            confidence = 0
+        final_prediction = model_prediction
 
-    print(f"{text} → {pred} ({confidence}%)")
+        method = "ML Model"
 
 
-# ---------------- SAVE ----------------
-os.makedirs("model", exist_ok=True)
+    print(
+        f"\nText: {text}"
+    )
 
-with open("model/sentiment_model.pkl", "wb") as f:
-    pickle.dump(model, f)
+    print(
+        f"ML Prediction: {model_prediction}"
+    )
 
-with open("model/w2v_model.pkl", "wb") as f:
-    pickle.dump(w2v_model, f)
+    print(
+        f"Final Prediction: {final_prediction}"
+    )
 
-print("\n💾 Model & Word2Vec saved successfully!")
+    print(
+        f"ML Confidence: {model_confidence:.2f}%"
+    )
+
+    print(
+        f"Method: {method}"
+    )
+
+    print(
+        "Probabilities:"
+    )
+
+
+    for label, probability in zip(
+        classes,
+        probabilities
+    ):
+
+        print(
+            f"   {label}: "
+            f"{probability * 100:.2f}%"
+        )
+
+
+# ============================================================
+# SAVE MODEL
+# ============================================================
+
+os.makedirs(
+    "model",
+    exist_ok=True
+)
+
+
+with open(
+    "model/sentiment_model.pkl",
+    "wb"
+) as f:
+
+    pickle.dump(
+        model,
+        f
+    )
+
+
+with open(
+    "model/tfidf_vectorizer.pkl",
+    "wb"
+) as f:
+
+    pickle.dump(
+        vectorizer,
+        f
+    )
+
+
+print("\n" + "=" * 65)
+
+print(
+    "💾 Model saved successfully!"
+)
+
+print(
+    "📁 model/sentiment_model.pkl"
+)
+
+print(
+    "📁 model/tfidf_vectorizer.pkl"
+)
+
+print("=" * 65)

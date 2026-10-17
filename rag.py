@@ -1,76 +1,284 @@
-from sentence_transformers import SentenceTransformer
 import pandas as pd
 import numpy as np
 import faiss
-import random
 
-# ---------------- LOAD DATA ----------------
-df = pd.read_csv("rag_data.csv")
+from sentence_transformers import SentenceTransformer
 
-# ---------------- METADATA ----------------
-countries = ["India", "USA"]
-years = [2023, 2024]
 
-# ✅ Make metadata consistent (only assign once)
+# ============================================================
+# LOAD DATA
+# ============================================================
+
+df = pd.read_csv(
+    "rag_data.csv"
+)
+
+
+df.columns = df.columns.str.strip()
+
+
+if "text" not in df.columns:
+
+    raise ValueError(
+        "❌ rag_data.csv must contain a 'text' column."
+    )
+
+
+# ============================================================
+# CLEAN TEXT
+# ============================================================
+
+df["text"] = (
+    df["text"]
+    .astype(str)
+    .str.strip()
+)
+
+
+df = df[
+    df["text"] != ""
+].reset_index(
+    drop=True
+)
+
+
+# ============================================================
+# METADATA
+# ============================================================
+
 if "country" not in df.columns:
-    df["country"] = [random.choice(countries) for _ in range(len(df))]
+
+    df["country"] = "Unknown"
+
 
 if "year" not in df.columns:
-    df["year"] = [random.choice(years) for _ in range(len(df))]
 
-# Normalize for safe filtering
-df["country"] = df["country"].astype(str)
-df["year"] = df["year"].astype(str)
-
-# ---------------- MODEL ----------------
-model = SentenceTransformer('all-MiniLM-L6-v2')
-
-# ---------------- EMBEDDINGS ----------------
-texts_all = df['text'].tolist()
-embeddings_all = model.encode(texts_all)
-
-index = faiss.IndexFlatL2(384)
-index.add(np.array(embeddings_all))
+    df["year"] = "Unknown"
 
 
-# ---------------- RETRIEVE ----------------
-def retrieve(query, country=None, year=None):
+df["country"] = (
+    df["country"]
+    .astype(str)
+)
+
+
+df["year"] = (
+    df["year"]
+    .astype(str)
+)
+
+
+# ============================================================
+# EMBEDDING MODEL
+# ============================================================
+
+print(
+    "🧠 Loading Sentence Transformer..."
+)
+
+
+embedding_model = SentenceTransformer(
+    "all-MiniLM-L6-v2"
+)
+
+
+print(
+    "✅ Embedding model loaded"
+)
+
+
+# ============================================================
+# EMBEDDINGS
+# ============================================================
+
+texts = (
+    df["text"]
+    .tolist()
+)
+
+
+embeddings = embedding_model.encode(
+
+    texts,
+
+    convert_to_numpy=True,
+
+    normalize_embeddings=True
+)
+
+
+# ============================================================
+# FAISS
+# ============================================================
+
+dimension = embeddings.shape[1]
+
+
+index = faiss.IndexFlatIP(
+    dimension
+)
+
+
+index.add(
+    embeddings.astype(
+        np.float32
+    )
+)
+
+
+# ============================================================
+# RETRIEVE
+# ============================================================
+
+def retrieve(
+    query,
+    country=None,
+    year=None,
+    top_k=3
+):
+
+    if not query:
+
+        return []
+
 
     filtered_df = df.copy()
 
-    # ✅ SAFE FILTERING
+
+    # --------------------------------------------------------
+    # COUNTRY FILTER
+    # --------------------------------------------------------
+
     if country:
+
         filtered_df = filtered_df[
-            filtered_df['country'].str.lower() == str(country).lower()
+            filtered_df["country"]
+            .str.lower()
+            ==
+            str(country).lower()
         ]
+
+
+    # --------------------------------------------------------
+    # YEAR FILTER
+    # --------------------------------------------------------
 
     if year:
+
         filtered_df = filtered_df[
-            filtered_df['year'] == str(year)
+            filtered_df["year"]
+            ==
+            str(year)
         ]
 
-    # ✅ FALLBACK
+
+    # --------------------------------------------------------
+    # FALLBACK
+    # --------------------------------------------------------
+
     if filtered_df.empty:
+
         filtered_df = df.copy()
 
-    texts = filtered_df['text'].tolist()
 
-    # ✅ Use subset embeddings (efficient)
-    emb = model.encode(texts)
+    texts = (
+        filtered_df["text"]
+        .tolist()
+    )
 
-    temp_index = faiss.IndexFlatL2(384)
-    temp_index.add(np.array(emb))
 
-    query_emb = model.encode([query])
+    if not texts:
 
-    k = min(3, len(texts))
-    D, I = temp_index.search(query_emb, k)
+        return []
+
+
+    # --------------------------------------------------------
+    # EMBED FILTERED DATA
+    # --------------------------------------------------------
+
+    filtered_embeddings = (
+        embedding_model.encode(
+
+            texts,
+
+            convert_to_numpy=True,
+
+            normalize_embeddings=True
+        )
+    )
+
+
+    temp_index = faiss.IndexFlatIP(
+        filtered_embeddings.shape[1]
+    )
+
+
+    temp_index.add(
+        filtered_embeddings.astype(
+            np.float32
+        )
+    )
+
+
+    # --------------------------------------------------------
+    # QUERY
+    # --------------------------------------------------------
+
+    query_embedding = (
+        embedding_model.encode(
+
+            [query],
+
+            convert_to_numpy=True,
+
+            normalize_embeddings=True
+        )
+    )
+
+
+    k = min(
+        top_k,
+        len(texts)
+    )
+
+
+    scores, indices = (
+        temp_index.search(
+            query_embedding.astype(
+                np.float32
+            ),
+            k
+        )
+    )
+
 
     results = []
-    for idx, dist in zip(I[0], D[0]):
-        results.append((texts[idx], dist))
 
-    # Sort by similarity
-    results = sorted(results, key=lambda x: x[1])
 
-    return [r[0] for r in results]
+    for idx, score in zip(
+        indices[0],
+        scores[0]
+    ):
+
+        if idx < 0:
+            continue
+
+
+        results.append(
+            (
+                texts[idx],
+                float(score)
+            )
+        )
+
+
+    results.sort(
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+
+    return [
+        text
+        for text, score in results
+    ]
